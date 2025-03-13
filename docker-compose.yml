@@ -12,9 +12,8 @@ services:
       DB_URL: "jdbc:mysql://mysql:3306/mi_base_de_datos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
       DB_USERNAME: "root"
       DB_PASSWORD: "rootpassword"
-    depends_on:
-      mysql:
-        condition: service_healthy  # Espera a que MySQL esté listo
+    networks:
+      - app-network
 
   mysql:
     image: mysql:8.0
@@ -26,12 +25,12 @@ services:
       MYSQL_ROOT_PASSWORD: "rootpassword"
     volumes:
       - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 20s  # Espera 20s antes de empezar a chequear
+    networks:
+      - app-network
 
 volumes:
   mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

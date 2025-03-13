@@ -19,5 +19,5 @@ COPY --from=build /app/target/*.jar app.jar
 # Exponer el puerto de la aplicación
 EXPOSE 8080
 
-# Ejecutar la aplicación
-CMD ["java", "-jar", "app.jar"]
+# Ejecutar un sleep de 30 segundos y luego iniciar la aplicación
+CMD ["sh", "-c", "sleep 30 && java -jar app.jar"]

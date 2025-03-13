@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/properties"; // Replace with your actual API
+const API_URL = "https://localhost:8080/api/properties"; // Replace with your actual API
 
 // Load all properties when the page loads
 document.addEventListener("DOMContentLoaded", fetchProperties);

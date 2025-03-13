@@ -18,7 +18,6 @@ public class SpringwebApplication {
 			System.setProperty("DB_URL", dotenv.get("DB_URL"));
 			System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
 			System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
-		
 		} catch (Exception e) {
 			System.out.println("No .env file found, using system environment variables.");
 			e.printStackTrace();
@@ -31,8 +30,15 @@ public class SpringwebApplication {
 		}
 		System.out.println("DB_URL: " + System.getProperty("DB_URL")); // Para verificar que se cargó correctamente
 		SpringApplication app = new SpringApplication(SpringwebApplication.class);
-		app.setDefaultProperties(Collections.singletonMap("server.port", "8080"));
+		app.setDefaultProperties(Collections.singletonMap("server.port", getPort()));
 		app.run(args); 
 	}
+
+	public static int getPort() {
+        if (System.getenv("PORT") != null) {
+            return Integer.parseInt(System.getenv("PORT"));
+        }
+        return 8080; //returns default port if heroku-port isn't set (i.e. on localhost)
+    } 
 
 }
