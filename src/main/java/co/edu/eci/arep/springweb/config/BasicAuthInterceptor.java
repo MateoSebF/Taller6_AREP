@@ -20,7 +20,7 @@ public class BasicAuthInterceptor implements HandlerInterceptor {
     static {
         EXCLUDE_URLS.add("/auth/login");
         EXCLUDE_URLS.add("/auth/register");
-        EXCLUDE_URLS.add("/properties");
+        EXCLUDE_URLS.add("/api/properties");
     }
 
     private boolean isExcludedUri(String requestURI) {
