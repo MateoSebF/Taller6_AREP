@@ -33,7 +33,7 @@ public class CorsConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(
-                Arrays.asList("http://localhost:8080", "https://frontarep.duckdns.org:8080", "https://localhost:8080", "https://arepmateo.duckdns.org:8080"));
+                Arrays.asList("http://localhost:8080", "https://frontarep.duckdns.org", "https://localhost:8080", "https://arepmateo.duckdns.org"));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         source.registerCorsConfiguration("/**", config);
