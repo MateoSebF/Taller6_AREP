@@ -2,7 +2,6 @@ package co.edu.eci.arep.springweb.config;
 
 import java.util.Arrays;
 
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -26,9 +25,8 @@ public class CorsConfig implements WebMvcConfigurer {
      * 
      * @return FilterRegistrationBean, the filter registration bean
      */
-    @SuppressWarnings("rawtypes")
     @Bean
-    public FilterRegistrationBean corsFilter() {
+    public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
@@ -37,10 +35,6 @@ public class CorsConfig implements WebMvcConfigurer {
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         source.registerCorsConfiguration("/**", config);
-        @SuppressWarnings("unchecked")
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(0);
-        return bean;
+        return new CorsFilter(source);
     }
-
 }
