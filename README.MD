@@ -1,36 +1,20 @@
 # Spring Server
+This repository contains an example of how to build a web server using Spring. It covers the complete process of creating the model, repository, service, and controller, as well as an additional class for filtering data during fetching. The project uses a MySQL database to persist data and is deployed to run in the cloud with AWS.
 
-This repository contains an example of how to build a web server using Spring. It covers the complete process of creating the model, repository, service, and controller, as well as an additional class for filtering data during fetching. The project uses a MySQL database to persist data and is deployed to work in the cloud with AWS.
+Additionally, a secure connection was implemented using Let's Encrypt certificates, enabling HTTPS requests to the pages. Furthermore, the deployment includes an Apache web server to provide a complete service.
 
 ## Getting Started
 
 This project is built in Java using Maven. Additional Spring Boot dependencies, such as Spring Web and JPA, are included in the pom.xml file.
 
-Important: This server requires a properly configured database to work. You must update the connection settings in the /src/main/resources/application.properties file.
+Important: This server requires a properly configured database to function. The database is set up in the docker-compose file, so use this as a reference to modify users or other aspects as needed.
 
 ### Prerequisites
 
 Before running this project, ensure you have the following installed on your system:
 
-* Java Development Kit (JDK) 21 or more
-    * Download and install from: [Oracle JDK or OpenJDK](https://www.oracle.com/co/java/technologies/downloads/)
-    * Verify installation with:
-        ```
-        java -version
-        ```
-* Apache Maven (for dependency management and build automation)
-    * Install from: [Maven Downloads](https://maven.apache.org/download.cgi#Installation)
-    * Verify installation with:
-        ```
-        mvn -version
-        ```
-* Git (to clone the repository)
-    * Install from: [Git Downloads](https://git-scm.com/downloads)
-    * Verify installation with:
-        ```
-        git --version
-        ```
-
+* Docker
+    
 ### Installing
 
 Follow these steps to set up and run the project in your local development environment:
@@ -38,92 +22,84 @@ Follow these steps to set up and run the project in your local development envir
 Clone the Repository:
 
 ```
-git clone https://github.com/MateoSebF/Taller5_AREP
+git clone https://github.com/MateoSebF/Taller6_AREP
 
 ```
 
 Navigate to the Project Directory:
 
 ```
-cd Taller5_AREP
+cd Taller6_AREP
 ```
 
-Build the Project with Maven:
+Build the Project with Docker:
 
-```
-mvn clean compile
-```
-
-Run the Web Server:
-
-```
-mvn clean compile exec:java
-```
-or
-```
-java -cp "target/classes" co.edu.eci.arep.springweb.SpringWebApplication
-```
 
 ### Architecture
 To understand the architecture followed in this article, we are going to use a diagram like this:
 
 ![Class Diagram](images/Class_Diagram.png)
 
-In this architecture, we consider the interaction between the components of the app to achieve the desired result. In this case, as is usually done, we have four principal components:
+In this architecture, we extend the structure of Lab5_AREP with the login system by defining the interaction between key components to ensure secure authentication. The design consists of four main components:
 
-Property: This is the model class where we define all the logic of a property, including attributes like id, direction, price, size, and name. This class is annotated with @Entity, indicating that it represents a table in our database.
+User: This is the model class where we define user-related attributes, such as id, email, and password. It is annotated with @Entity, indicating that it represents a table in the database.
 
-PropertyRepository: This class allows us to interact with the database, enabling operations such as saving, deleting, and retrieving data. It is annotated with @Repository, which makes it possible to inject it into the PropertyService.
+UserRepository: This interface extends JpaRepository and allows interaction with the database, enabling operations such as saving, deleting, and retrieving user data. It is annotated with @Repository, making it injectable into the UserService.
 
-PropertyService: This class defines the logic for querying the repository. A special feature of our app is the PropertySpecification class, which allows searching for properties based on various criteria such as a minimum price range, a size range, or a specific direction. Using this class, we can query the repository with a specific specification, making the program more dynamic.
+UserService: This class contains the business logic for user authentication and management. It handles operations like user registration, password encoding, and authentication validation. It interacts with UserRepository to fetch or update user data securely.
 
-PropertyController: This class injects the PropertyService, which is annotated with @Service, making it a bean that can be injected. The controller exposes an endpoint called /api/properties, where all required queries can be made.
+UserController: This class serves as the entry point for authentication-related operations. It is annotated with @RestController and exposes endpoints such as /auth/register and /auth/login. The controller processes authentication requests, validates user credentials, and returns appropriate responses, such as JWT tokens for secure session management.
 
-This image illustrates the functionality of the application, including the implementation of additional features such as pagination and the ability to filter properties using specific criteria. 
+This architecture ensures a clear separation of concerns, making the system maintainable and scalable. Security measures, such as password hashing using BCryptPasswordEncoder.
 
-![Example of working](/images/Example_of_working.png)
+# Deployment
+To deploy this project, we use a Docker-based solution on AWS, ensuring a secure and scalable setup.
 
-The section "Deployment Demo" provides a complete demonstration of the project's use case.
+## AWS Deployment
+To deploy the application on AWS, we performed the following steps:
 
-## Deployment  
+1. Created two EC2 instances—one for the backend and one for the frontend.
+2. Configured security rules to allow inbound traffic on the required ports:
+    - 80 and 443 for HTTPS access.
+    - 3306 for MySQL (restricted access).
+3. Assigned an Elastic IP to each instance to ensure a static address.
+4. Configured a custom domain using Duck DNS, associating it with the Elastic IPs.
+5. Installed Let's Encrypt and Certbot on both instances to generate SSL certificates, enabling secure HTTPS connections for both the frontend and backend.
 
+## Backend Deployment
+1. Installed Git and Docker on the EC2 instance.
 
-To deploy this project, we provide a Docker-based solution.
+2. Cloned the repository and navigated to the backend folder.
 
-First, we create a MySQL image and deploy it on Azure, ensuring that port 3306 is correctly configured. After that, we update the database information in the application.properties file.
+3. Ran the following command to build and start the backend and database containers:
 
-Next, we create an image using a Dockerfile to configure the environment. This file specifies important aspects such as the port configuration. This is crucial because, when deploying the application, you need to specify both the internal port used by the app and the external port to expose.
+```
+docker-compose up --build -d
+```
 
-To deploy this service, you should create the image using the Dockerfile. This process automatically retrieves dependencies, compiles the classes, and includes the static files necessary for the correct functioning of the server. You must then link this image to a repository in Docker Hub. Once this is done, you can run the container on AWS. By configuring the security group to accept the necessary requests and linking a correctly configured database, the application will function properly.
+4. This command builds the backend image and deploys both the backend and MySQL containers.
+5. The application now runs securely with HTTPS, as seen in the deployment demo.
 
-### AWS Deployment  
+## Frontend Deployment
+1. Installed Git and Docker on the frontend EC2 instance.
 
-To deploy the application on **AWS**, follow these steps:  
+2. Cloned the repository and navigated to the frontend folder.
 
-1. **Create an EC2 instance** according to your requirements.  
-2. **Configure security rules** for the instance:  
-   - Allow inbound connections to the port you want to expose (e.g., `8080`).  
-3. **Connect to the EC2 instance** via SSH.  
-4. **Install and configure Docker** on the instance.  
-5. **Run the container** using the following command:  
+3. Built the frontend Docker image using:
 
-   ```sh
-   docker run -d -p 8080:8080 --name name_container your_user/your_repo 
-   ```
-    ### Container Configuration  
+```
+docker build -t frontend-app .
+```
+4. Ran the frontend container using:
 
-- `8080` is the **internal port** used by the server (defined in the `Dockerfile` as an environment variable).  
-- `8080` is the **exposed port** that will be accessible from the internet.  
-
-Once the container is running, you can access the application via the **public DNS** provided by AWS.  
-
-### Endpoint Structure  
-
-- **REST API endpoints:** `/app/repositories`   
+```
+docker run -d -p 80:80 -p 443:443 --name frontend-container frontend-app
+```
+5. The frontend is now accessible via the configured Duck DNS domain over HTTPS.
 
 ### Link to Deployment Demo Demostration 
 
-[Watch the deployment in action](https://pruebacorreoescuelaingeduco.sharepoint.com/sites/Reco842/Shared%20Documents/General/Recordings/Reuni%C3%B3n%20en%20_General_-20250305_170626-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?web=1&referrer=Teams.TEAMS-WEB&referrerScenario=MeetingChicletGetLink.view)  
+[Watch the deployment in action](https://pruebacorreoescuelaingeduco.sharepoint.com/sites/Reco842/Shared%20Documents/General/Recordings/Reuni%C3%B3n%20en%20_General_-20250314_011913-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?web=1&referrer=Teams.TEAMS-WEB&referrerScenario=MeetingChicletGetLink.view)  
 
 
 ## Built With
